@@ -1,0 +1,125 @@
+<app-content>
+  <app-loader *ngIf="loading"></app-loader>
+  <app-table-header>
+    <div>
+      <app-search placeholder="CompaniesPage.SearchPlaceholder" (inputChanged)="onSearch($event)" [inputValue]="searchString"></app-search>
+    </div>
+
+    <div fxHide.xs fxLayout="row" fxLayoutGap="8px">
+      <ng-container *ngTemplateOutlet="addCompanyButton"></ng-container>
+      <app-export-button
+        [loading]="exporting"
+        [disabled]="!count"
+        (exportCsv)="export(true)"
+        (exportXlsx)="export(false)"
+      ></app-export-button>
+    </div>
+    <div fxHide fxShow.xs>
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <ng-container *ngTemplateOutlet="addCompanyButton"></ng-container>
+      </mat-menu>
+    </div>
+  </app-table-header>
+  <app-table-container>
+    <table mat-table matSort [dataSource]="dataSource" class="full-width">
+      <ng-container [matColumnDef]="companiesTableColumnNames.companyName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'CommonTableColumns.Name' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <a class="clickable-text" [routerLink]="['/companyInfo', element.companyId]">{{ element.companyName }}</a>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="companiesTableColumnNames.vat">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'CompaniesPage.TableColumns.Vat' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <div>{{ element.vat }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="companiesTableColumnNames.parentCompanyName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'CompaniesPage.TableColumns.ParentCompany' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <a class="clickable-text" [routerLink]="['/companyInfo', element.parentCompanyId]">{{ element.parentCompanyName }}</a>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="companiesTableColumnNames.contactPersons">
+        <th mat-header-cell *matHeaderCellDef>{{ 'CompaniesPage.TableColumns.ContactPersons' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <div
+            class="clickable-text"
+            *ngFor="let contactPerson of element.contactPersons"
+            (click)="openUserDialog(contactPerson, element.companyName)"
+          >
+            {{ contactPerson.displayName }}
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="companiesTableColumnNames.siteCountry">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'CompaniesPage.TableColumns.SiteCountry' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <div>{{ getCountryName(element.siteCountry) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="companiesTableColumnNames.siteCity">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'CompaniesPage.TableColumns.SiteCity' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <div>{{ element.siteCity }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="companiesTableColumnNames.siteAddress">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'CompaniesPage.TableColumns.SiteAddress' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <div>{{ element.siteAddress }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="companiesTableColumnNames.sitePhone">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'CompaniesPage.TableColumns.SitePhone' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <div>{{ element.sitePhone }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="companiesTableColumnNames.actions">
+        <th mat-header-cell *matHeaderCellDef>{{ 'CommonTableColumns.Actions' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button [routerLink]="['/companies/edit', element.companyId]">
+            <mat-icon fontSet="material-icons-outlined">mode_edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteCompany(element)">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="noData">
+        <mat-footer-cell *matFooterCellDef>
+          {{ 'Common.NoDataFound' | translate }}
+        </mat-footer-cell>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <mat-footer-row
+        *matFooterRowDef="['noData']"
+        [ngClass]="{ hide: !(dataSource !== null && dataSource.length === 0) || loading }"
+      ></mat-footer-row>
+    </table>
+  </app-table-container>
+  <mat-paginator [pageSizeOptions]="pageSizeOptions" [length]="count" [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
+</app-content>
+
+<ng-template #addCompanyButton>
+  <button mat-button color="accent" [routerLink]="['/companies/create']">
+    <mat-icon [style.marginRight]="'8px'">add_circle_outline</mat-icon>
+    <span>{{ 'Companies.CreateCompany' | translate | uppercase }}</span>
+  </button>
+</ng-template>

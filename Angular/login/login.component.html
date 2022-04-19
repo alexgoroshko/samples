@@ -1,0 +1,20 @@
+<header class="header mat-elevation-z2" fxLayout='row'>
+  <div class="logo-background" fxFlex.xs="100%">
+    <div class="logo-container">
+      <img src="assets/images/logo.svg" alt="logo" class="logo">
+      <span class="logo-text">Customer <br> Info</span>
+    </div>
+  </div>
+  <h1 class="header-text"><span>Customer</span> - info</h1>
+</header>
+<div class="login-container">
+  <div fxLayout="column" class="card-wrapper" fxLayoutGap="20px">
+    <mat-card class="mat-elevation-z2" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="20px">
+      <mat-spinner *ngIf="authInProcess" color="accent"></mat-spinner>
+      <mat-icon *ngIf="!authInProcess">face</mat-icon>
+      <button class="full-width" [disabled]="authInProcess" mat-raised-button color="accent" (click)="authService.onLogin()">
+        <span>{{ "Common.Login" | translate | uppercase}}</span>
+      </button>
+    </mat-card>
+  </div>
+</div>

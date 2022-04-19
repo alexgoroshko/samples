@@ -1,0 +1,23 @@
+@use "../../../components/footer/footer.component" as footer;
+@use "../../../modules/shared/header/header.component" as header;
+
+@mixin content-padding-and-height($content-padding-top-bottom, $content-padding-r-l) {
+  padding: $content-padding-top-bottom $content-padding-r-l;
+  min-height: calc(100vh - #{footer.$footer-height} - #{header.$header-height + $content-padding-top-bottom * 2});
+}
+
+.content {
+  margin-top: calc(#{header.$header-height} - 1px);
+  background-color: #F5F5F6;
+  @include content-padding-and-height(10px, 10px);
+
+  .table-container {
+    background-color: white;
+  }
+}
+
+@media screen and (max-width: 1279px) {
+  .content {
+    @include content-padding-and-height(0, 0);
+  }
+}
